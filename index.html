@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedoku</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="grid"><div></div><div id="type1"></div><div id="type2"></div><div id="type3"></div><div></div>
+        <div id="typeA"></div><button class="gridb" id="top-left"></button><button class="gridb" id="top-middle"></button><button class="gridb" id="top-right"></button><div></div>
+        <div id="typeB"></div><button class="gridb" id="middle-left"></button><button class="gridb" id="middle-middle"></button><button class="gridb" id="middle-right"></button><div></div>
+        <div id="typeC"></div><button class="gridb" id="bottom-left"></button><button class="gridb" id="bottom-middle"></button><button class="gridb" id="bottom-right"></button><div></div>
+    </div>
+    <div id="input">
+        <div id="pokemon-popup" class="popup">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>Select a Pokémon</h2>
+                <div class="search-container">
+                    <input type="text" id="pokemon-search" placeholder="Search Pokémon...">
+                </div>
+                <div id="search-results"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<style>
+    body {
+        display: flex;
+        background-color: rgb(54, 54, 99);
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: white;
+        font-family: "Tiny5", sans-serif;
+    }
+    #grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        grid-gap: 3px;
+        background-color: rgba(255, 255, 255, 0);
+    }
+    .gridb {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 150px;
+        height: 150px;
+        background-color: rgb(75, 75, 114);
+        border-radius: 5px;
+        color: white;
+        font-family: "Tiny5", sans-serif;
+    }
+    #top-left {
+        border-top-left-radius: 25px;
+    }
+    #top-right {
+        border-top-right-radius: 25px;
+    }
+    #bottom-left {
+        border-bottom-left-radius: 25px;
+    }
+    #bottom-right {
+        border-bottom-right-radius: 25px;
+    }
+    .gridb:hover {
+        background-color: rgb(117, 117, 156);
+    }
+    .popup {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+    
+    .popup-content {
+        background-color: rgb(54, 54, 99);
+        margin: 10% auto;
+        padding: 20px;
+        border: 2px solid rgb(117, 117, 156);
+        border-radius: 15px;
+        width: 80%;
+        max-width: 500px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .close-popup {
+        color: white;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        position: relative;
+        top: -15px;
+        right: -5px;
+    }
+    
+    .close-popup:hover {
+        color: rgb(200, 200, 255);
+    }
+    
+    h2 {
+        margin-top: 0;
+        color: white;
+        font-family: "Tiny5", sans-serif;
+        text-align: center;
+    }
+    
+    .search-container {
+        display: flex;
+        margin-bottom: 10px;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    #pokemon-search {
+        flex-grow: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 5px 0 0 5px;
+        font-family: "Tiny5", sans-serif;
+        background-color: rgb(75, 75, 114);
+        color: white;
+    }
+    
+    #pokemon-search::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    
+    #search-results {
+        background-color: rgb(75, 75, 114);
+        border-radius: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 10px;
+    }
+    
+    .pokemon-item {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .pokemon-item:hover {
+        background-color: rgb(117, 117, 156);
+    }
+    
+    .pokemon-item img {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+    }
+    /* Add these styles to your existing CSS */
+    .pokemon-grid-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .pokemon-name {
+        margin-top: 5px;
+        font-size: 14px;
+        text-align: center;
+        color: white;
+        font-family: "Tiny5", sans-serif;
+        /* Ensure text doesn't overflow */
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+        top: -5px;
+    }
+    
+    /* Adjust the grid button to better accommodate the name */
+    .gridb {
+        padding: 5px;
+        box-sizing: border-box;
+    }
+    
+    /* Adjust the image size to leave room for the name */
+    .pokemon-grid-item img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+    }
+</style>
+<script>
+    // Get all elements with the class "gridb"
+    const gridButtons = document.querySelectorAll('.gridb');
+    const popup = document.getElementById('pokemon-popup');
+    const closePopup = document.querySelector('.close-popup');
+    let currentTile = null;
+    
+    // Add click event listener to each button
+    gridButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Get the ID of the clicked button
+            const buttonId = this.id;
+            currentTile = this;
+            
+            // Show the popup
+            popup.style.display = 'block';
+            
+            // Focus on the search input
+            document.getElementById('pokemon-search').focus();
+        });
+    });
+    
+    // Close popup when clicking the X
+    closePopup.addEventListener('click', function() {
+        popup.style.display = 'none';
+    });
+    
+    // Close popup when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target === popup) {
+            popup.style.display = 'none';
+        }
+    });
+    
+    // Pokemon search functionality
+    const searchInput = document.getElementById('pokemon-search');
+    const searchResults = document.getElementById('search-results');
+    
+    // Debounce function to limit how often the search is triggered
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+    
+    // Function to search Pokemon
+    async function searchPokemon() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        if (!searchTerm) {
+            searchResults.innerHTML = '<p>Please enter a Pokémon name</p>';
+            return;
+        }
+        
+        searchResults.innerHTML = '<p>Searching...</p>';
+        
+        try {
+            // First try to get the exact Pokemon
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${searchTerm}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayPokemon([data]);
+            } else {
+                // If not found, get a list of Pokemon to filter
+                const listResponse = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1000');
+                const listData = await listResponse.json();
+                
+                // Filter Pokemon by name containing the search term
+                const filteredPokemon = listData.results.filter(pokemon => 
+                    pokemon.name.includes(searchTerm)
+                );
+                
+                if (filteredPokemon.length > 0) {
+                    // Get detailed data for each filtered Pokemon
+                    const pokemonDetailsPromises = filteredPokemon.slice(0, 10).map(pokemon => 
+                        fetch(pokemon.url).then(res => res.json())
+                    );
+                    
+                    const pokemonDetails = await Promise.all(pokemonDetailsPromises);
+                    displayPokemon(pokemonDetails);
+                } else {
+                    searchResults.innerHTML = '<p>No Pokémon found</p>';
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching Pokémon data:', error);
+            searchResults.innerHTML = '<p>Error searching for Pokémon</p>';
+        }
+    }
+    
+    // Function to display Pokemon search results
+    function displayPokemon(pokemonList) {
+        searchResults.innerHTML = '';
+        
+        pokemonList.forEach(pokemon => {
+            const pokemonItem = document.createElement('div');
+            pokemonItem.className = 'pokemon-item';
+            
+            const sprite = pokemon.sprites.front_default || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';
+            const pokemonName = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
+            
+            pokemonItem.innerHTML = `
+                <img src="${sprite}" alt="${pokemon.name}">
+                <div>
+                    <div>${pokemonName}</div>
+                </div>
+            `;
+            
+            pokemonItem.addEventListener('click', () => {
+                // Place the selected Pokemon on the current tile with name underneath
+                if (currentTile) {
+                    currentTile.innerHTML = `
+                        <div class="pokemon-grid-item">
+                            <img src="${sprite}" alt="${pokemon.name}" style="width: 100px; height: 100px;">
+                            <div class="pokemon-name">${pokemonName}</div>
+                        </div>
+                    `;
+                    popup.style.display = 'none';
+                    searchInput.value = '';
+                    searchResults.innerHTML = '';
+                }
+            });
+            
+            searchResults.appendChild(pokemonItem);
+        });
+    }
+    
+    // Create a debounced search function that will only execute after the user stops typing for 300ms
+    const debouncedSearch = debounce(searchPokemon, 300);
+    
+    // Event listener for input changes
+    searchInput.addEventListener('input', debouncedSearch);
+    // Function to get a random type image
+    function getRandomTypeImage() {
+        const typeNumber = Math.floor(Math.random() * 18) + 1; // Random number between 1 and 18
+        return `/types/${typeNumber}.png`;
+    }
+
+    // Function to fill the top and left of the grid with random types
+    function fillGridWithTypes() {
+        const typeCells = ['type1', 'type2', 'type3', 'typeA', 'typeB', 'typeC'];
+        typeCells.forEach(cellId => {
+            const cell = document.getElementById(cellId);
+            const typeImage = getRandomTypeImage();
+            cell.innerHTML = `<img src="${typeImage}" alt="Type" style="width: 100%; height: 100%;">`;
+        });
+    }
+
+    // Call the function to fill the grid with types on page load
+    window.addEventListener('load', fillGridWithTypes);
+
+</script>
